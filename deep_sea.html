@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bioluminescent Deep</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .frame {
+    position: relative;
+    width: min(90vw, 700px);
+    aspect-ratio: 3/4;
+    border: 1px solid rgba(100,200,255,0.15);
+    box-shadow:
+      0 0 60px rgba(0,180,255,0.08),
+      0 0 120px rgba(0,80,200,0.05),
+      inset 0 0 80px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .title {
+    margin-top: 18px;
+    color: rgba(140, 210, 255, 0.55);
+    font-size: clamp(11px, 2vw, 14px);
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+  }
+
+  /* Jellyfish pulse */
+  @keyframes pulse {
+    0%, 100% { opacity: 0.7; transform: scaleX(1) scaleY(1); }
+    50% { opacity: 1; transform: scaleX(1.06) scaleY(0.96); }
+  }
+  @keyframes drift {
+    0%   { transform: translateX(0px)   translateY(0px); }
+    25%  { transform: translateX(8px)   translateY(-12px); }
+    50%  { transform: translateX(-5px)  translateY(-22px); }
+    75%  { transform: translateX(-10px) translateY(-10px); }
+    100% { transform: translateX(0px)   translateY(0px); }
+  }
+  @keyframes drift2 {
+    0%   { transform: translateX(0px)  translateY(0px); }
+    33%  { transform: translateX(-14px) translateY(-16px); }
+    66%  { transform: translateX(10px)  translateY(-28px); }
+    100% { transform: translateX(0px)  translateY(0px); }
+  }
+  @keyframes drift3 {
+    0%   { transform: translateX(0px) translateY(0px); }
+    40%  { transform: translateX(18px) translateY(-18px); }
+    80%  { transform: translateX(-8px) translateY(-32px); }
+    100% { transform: translateX(0px) translateY(0px); }
+  }
+  @keyframes tentacle {
+    0%, 100% { d: path("M0,0 C2,10 -2,20 1,30 C3,40 -1,50 0,60"); }
+    50%       { d: path("M0,0 C-3,10 3,20 -1,30 C2,40 -3,50 0,60"); }
+  }
+  @keyframes glow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.9; }
+  }
+  @keyframes particlefloat {
+    0%   { transform: translateY(0px)  translateX(0px); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-600px) translateX(var(--dx, 20px)); opacity: 0; }
+  }
+  @keyframes fishswim {
+    0%   { transform: translateX(-80px); }
+    100% { transform: translateX(820px); }
+  }
+  @keyframes fishswim2 {
+    0%   { transform: translateX(820px) scaleX(-1); }
+    100% { transform: translateX(-80px) scaleX(-1); }
+  }
+  @keyframes coralwave {
+    0%, 100% { transform-origin: bottom center; transform: rotate(-2deg); }
+    50%       { transform-origin: bottom center; transform: rotate(2deg); }
+  }
+  @keyframes bubblerise {
+    0%   { transform: translateY(0px) translateX(0px); opacity: 0.6; }
+    100% { transform: translateY(-650px) translateX(var(--bx, 5px)); opacity: 0; }
+  }
+  @keyframes angler-glow {
+    0%, 100% { filter: drop-shadow(0 0 4px #00ffcc) drop-shadow(0 0 12px #00ffcc); opacity: 0.8; }
+    50%       { filter: drop-shadow(0 0 10px #00ffcc) drop-shadow(0 0 28px #00ffcc); opacity: 1; }
+  }
+
+  .jelly1 { animation: drift 14s ease-in-out infinite; }
+  .jelly2 { animation: drift2 18s ease-in-out infinite; }
+  .jelly3 { animation: drift3 11s ease-in-out infinite; }
+  .jelly-body { animation: pulse 3s ease-in-out infinite; }
+  .jelly-body2 { animation: pulse 3.8s ease-in-out infinite; }
+  .jelly-body3 { animation: pulse 2.6s ease-in-out infinite; }
+
+  .p1  { --dx: 15px;  animation: particlefloat 9s  linear infinite; animation-delay: 0s; }
+  .p2  { --dx: -20px; animation: particlefloat 12s linear infinite; animation-delay: 1.5s; }
+  .p3  { --dx: 8px;   animation: particlefloat 7s  linear infinite; animation-delay: 3s; }
+  .p4  { --dx: -12px; animation: particlefloat 15s linear infinite; animation-delay: 4.5s; }
+  .p5  { --dx: 22px;  animation: particlefloat 10s linear infinite; animation-delay: 2s; }
+  .p6  { --dx: -5px;  animation: particlefloat 8s  linear infinite; animation-delay: 6s; }
+  .p7  { --dx: 18px;  animation: particlefloat 11s linear infinite; animation-delay: 0.7s; }
+  .p8  { --dx: -16px; animation: particlefloat 13s linear infinite; animation-delay: 5s; }
+  .p9  { --dx: 10px;  animation: particlefloat 9s  linear infinite; animation-delay: 3.8s; }
+  .p10 { --dx: -25px; animation: particlefloat 14s linear infinite; animation-delay: 1s; }
+
+  .fish1 { animation: fishswim 22s linear infinite; animation-delay: 3s; }
+  .fish2 { animation: fishswim2 28s linear infinite; animation-delay: 10s; }
+
+  .coral1 { animation: coralwave 5s ease-in-out infinite; }
+  .coral2 { animation: coralwave 6.5s ease-in-out infinite reverse; }
+  .coral3 { animation: coralwave 4s ease-in-out infinite; }
+
+  .b1 { --bx: 4px;  animation: bubblerise 8s  linear infinite; animation-delay: 0s; }
+  .b2 { --bx: -6px; animation: bubblerise 11s linear infinite; animation-delay: 2s; }
+  .b3 { --bx: 8px;  animation: bubblerise 7s  linear infinite; animation-delay: 5s; }
+  .b4 { --bx: -3px; animation: bubblerise 13s linear infinite; animation-delay: 1s; }
+  .b5 { --bx: 6px;  animation: bubblerise 9s  linear infinite; animation-delay: 7s; }
+
+  .angler-lure { animation: angler-glow 2.2s ease-in-out infinite; }
+  .glow-orb { animation: glow 4s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<div class="frame">
+<svg viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Depth gradient -->
+    <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#001220"/>
+      <stop offset="30%"  stop-color="#000d1a"/>
+      <stop offset="70%"  stop-color="#000810"/>
+      <stop offset="100%" stop-color="#000408"/>
+    </linearGradient>
+
+    <!-- Caustic light rays -->
+    <radialGradient id="caustic1" cx="30%" cy="0%" r="60%">
+      <stop offset="0%"   stop-color="#0066aa" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0066aa" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="caustic2" cx="70%" cy="0%" r="50%">
+      <stop offset="0%"   stop-color="#003366" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#003366" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Jellyfish glow radials -->
+    <radialGradient id="jellyGlow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#88eeff" stop-opacity="0.9"/>
+      <stop offset="60%"  stop-color="#22aacc" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#0044aa" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="jellyGlow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#ffaaee" stop-opacity="0.85"/>
+      <stop offset="60%"  stop-color="#cc44aa" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#440088" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="jellyGlow3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#aaffcc" stop-opacity="0.9"/>
+      <stop offset="60%"  stop-color="#22cc88" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#004422" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Coral gradient -->
+    <linearGradient id="coralGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#ff6688"/>
+      <stop offset="100%" stop-color="#440022"/>
+    </linearGradient>
+    <linearGradient id="coralGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#ff9944"/>
+      <stop offset="100%" stop-color="#441100"/>
+    </linearGradient>
+    <linearGradient id="coralGrad3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#44ffdd"/>
+      <stop offset="100%" stop-color="#003322"/>
+    </linearGradient>
+
+    <!-- Seabed gradient -->
+    <linearGradient id="seabed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0a0820"/>
+      <stop offset="100%" stop-color="#050410"/>
+    </linearGradient>
+
+    <!-- Filter: blur glow -->
+    <filter id="blur4">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <filter id="blur2">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+    <filter id="blur8">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <filter id="blur1">
+      <feGaussianBlur stdDeviation="1"/>
+    </filter>
+  </defs>
+
+  <!-- Ocean background -->
+  <rect width="600" height="800" fill="url(#ocean)"/>
+  <rect width="600" height="800" fill="url(#caustic1)"/>
+  <rect width="600" height="800" fill="url(#caustic2)"/>
+
+  <!-- Subtle depth rays -->
+  <g opacity="0.04">
+    <polygon points="200,0 220,0 320,800 280,800" fill="#66ccff"/>
+    <polygon points="350,0 370,0 440,800 400,800" fill="#66ccff"/>
+    <polygon points="80,0  95,0  180,800 140,800" fill="#66ccff"/>
+    <polygon points="500,0 512,0 580,800 550,800" fill="#66ccff"/>
+  </g>
+
+  <!-- ===== PARTICLES (bioluminescent specks) ===== -->
+  <g filter="url(#blur1)">
+    <circle class="p1"  cx="80"  cy="780" r="1.5" fill="#66ffee" opacity="0.8"/>
+    <circle class="p2"  cx="200" cy="760" r="1"   fill="#aaeeff" opacity="0.8"/>
+    <circle class="p3"  cx="330" cy="790" r="2"   fill="#ffaadd" opacity="0.8"/>
+    <circle class="p4"  cx="450" cy="770" r="1.5" fill="#88ffcc" opacity="0.8"/>
+    <circle class="p5"  cx="520" cy="780" r="1"   fill="#66aaff" opacity="0.8"/>
+    <circle class="p6"  cx="140" cy="750" r="1.5" fill="#ffddaa" opacity="0.8"/>
+    <circle class="p7"  cx="390" cy="760" r="1"   fill="#ccffaa" opacity="0.8"/>
+    <circle class="p8"  cx="260" cy="790" r="2"   fill="#88eeff" opacity="0.8"/>
+    <circle class="p9"  cx="560" cy="770" r="1.5" fill="#ff88cc" opacity="0.8"/>
+    <circle class="p10" cx="40"  cy="780" r="1"   fill="#aaffee" opacity="0.8"/>
+  </g>
+
+  <!-- ===== SEABED ===== -->
+  <ellipse cx="300" cy="820" rx="360" ry="60" fill="url(#seabed)" opacity="0.98"/>
+  <ellipse cx="100" cy="810" rx="160" ry="40" fill="#060418" opacity="0.7"/>
+  <ellipse cx="500" cy="815" rx="140" ry="35" fill="#060418" opacity="0.6"/>
+
+  <!-- Rocks -->
+  <ellipse cx="60"  cy="800" rx="38" ry="18" fill="#080616"/>
+  <ellipse cx="160" cy="805" rx="28" ry="14" fill="#090718"/>
+  <ellipse cx="480" cy="800" rx="42" ry="20" fill="#080616"/>
+  <ellipse cx="560" cy="808" rx="22" ry="12" fill="#090718"/>
+  <ellipse cx="300" cy="808" rx="30" ry="16" fill="#070515"/>
+
+  <!-- ===== CORAL ===== -->
+  <!-- Coral cluster left -->
+  <g class="coral1" transform-origin="80 780">
+    <line x1="80" y1="780" x2="68" y2="730" stroke="url(#coralGrad1)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="80" y1="780" x2="82" y2="728" stroke="url(#coralGrad1)" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="80" y1="780" x2="95" y2="735" stroke="url(#coralGrad1)" stroke-width="2" stroke-linecap="round"/>
+    <!-- branches -->
+    <line x1="74" y1="755" x2="62" y2="740" stroke="#ff6688" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+    <line x1="74" y1="755" x2="78" y2="738" stroke="#ff6688" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+    <line x1="82" y1="748" x2="90" y2="733" stroke="#ff6688" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+    <line x1="82" y1="748" x2="75" y2="732" stroke="#ff6688" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+    <!-- polyps -->
+    <circle cx="68" cy="730" r="4" fill="#ff6688" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="82" cy="728" r="3.5" fill="#ff8899" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="95" cy="735" r="3" fill="#ff6688" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="62" cy="740" r="2.5" fill="#ff9999" opacity="0.8" filter="url(#blur1)"/>
+    <circle cx="90" cy="733" r="2.5" fill="#ff6688" opacity="0.8" filter="url(#blur1)"/>
+  </g>
+  <!-- Glow for coral 1 -->
+  <g filter="url(#blur4)" opacity="0.5">
+    <circle cx="80" cy="740" r="25" fill="#ff2244" opacity="0.3"/>
+  </g>
+
+  <!-- Coral cluster center-left -->
+  <g class="coral2" transform-origin="200 785">
+    <line x1="200" y1="785" x2="192" y2="740" stroke="url(#coralGrad2)" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="200" y1="785" x2="208" y2="738" stroke="url(#coralGrad2)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="196" y1="762" x2="182" y2="748" stroke="#ff9944" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <line x1="196" y1="762" x2="200" y2="745" stroke="#ff9944" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <line x1="204" y1="758" x2="216" y2="743" stroke="#ff9944" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <circle cx="192" cy="740" r="4" fill="#ffaa44" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="208" cy="738" r="3.5" fill="#ffbb66" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="182" cy="748" r="3" fill="#ff8822" opacity="0.8" filter="url(#blur1)"/>
+    <circle cx="216" cy="743" r="3" fill="#ffaa44" opacity="0.8" filter="url(#blur1)"/>
+  </g>
+  <g filter="url(#blur4)" opacity="0.5">
+    <circle cx="200" cy="755" r="28" fill="#ff6600" opacity="0.25"/>
+  </g>
+
+  <!-- Coral right - teal fan coral -->
+  <g class="coral3" transform-origin="500 778">
+    <line x1="500" y1="778" x2="485" y2="730" stroke="url(#coralGrad3)" stroke-width="3" stroke-linecap="round"/>
+    <line x1="500" y1="778" x2="500" y2="725" stroke="url(#coralGrad3)" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="500" y1="778" x2="516" y2="732" stroke="url(#coralGrad3)" stroke-width="2" stroke-linecap="round"/>
+    <!-- fan branches -->
+    <line x1="492" y1="755" x2="478" y2="738" stroke="#44ffdd" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="492" y1="755" x2="488" y2="736" stroke="#44ffdd" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="500" y1="748" x2="494" y2="730" stroke="#44ffdd" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="500" y1="748" x2="506" y2="731" stroke="#44ffdd" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="508" y1="752" x2="520" y2="736" stroke="#44ffdd" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <circle cx="485" cy="730" r="3.5" fill="#66ffee" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="500" cy="725" r="4"   fill="#44ffdd" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="516" cy="732" r="3"   fill="#66ffcc" opacity="0.9" filter="url(#blur1)"/>
+    <circle cx="478" cy="738" r="2.5" fill="#44ffee" opacity="0.8" filter="url(#blur1)"/>
+    <circle cx="520" cy="736" r="2.5" fill="#66ffdd" opacity="0.8" filter="url(#blur1)"/>
+  </g>
+  <g filter="url(#blur4)" opacity="0.5">
+    <circle cx="500" cy="748" r="28" fill="#00ffaa" opacity="0.2"/>
+  </g>
+
+  <!-- ===== BUBBLES ===== -->
+  <g opacity="0.5">
+    <circle class="b1" cx="120" cy="790" r="2"   fill="none" stroke="#88eeff" stroke-width="0.8"/>
+    <circle class="b2" cx="280" cy="785" r="3"   fill="none" stroke="#aaddff" stroke-width="0.8"/>
+    <circle class="b3" cx="420" cy="792" r="1.5" fill="none" stroke="#88eeff" stroke-width="0.6"/>
+    <circle class="b4" cx="350" cy="788" r="2.5" fill="none" stroke="#aaddff" stroke-width="0.8"/>
+    <circle class="b5" cx="180" cy="786" r="2"   fill="none" stroke="#88eeff" stroke-width="0.7"/>
+  </g>
+
+  <!-- ===== FISH (small bioluminescent) ===== -->
+  <!-- Small lanternfish left-to-right -->
+  <g class="fish1">
+    <g transform="translate(0, 520)">
+      <!-- body -->
+      <ellipse cx="0" cy="0" rx="14" ry="6" fill="#112233"/>
+      <!-- tail -->
+      <polygon points="-14,0 -22,-5 -22,5" fill="#112233"/>
+      <!-- eye -->
+      <circle cx="8" cy="-1" r="2.5" fill="#00ffcc" filter="url(#blur1)" opacity="0.9"/>
+      <circle cx="8" cy="-1" r="1.2" fill="#ffffff" opacity="0.6"/>
+      <!-- bioluminescent spots -->
+      <circle cx="2"  cy="2"  r="1.5" fill="#0088ff" opacity="0.7" filter="url(#blur1)"/>
+      <circle cx="-3" cy="1"  r="1"   fill="#00ffcc" opacity="0.6" filter="url(#blur1)"/>
+      <circle cx="-8" cy="0"  r="1.2" fill="#0088ff" opacity="0.5" filter="url(#blur1)"/>
+      <!-- fin -->
+      <ellipse cx="-2" cy="-5" rx="6" ry="2.5" fill="#0d1e2e" transform="rotate(-15 -2 -5)"/>
+      <!-- glow under -->
+      <ellipse cx="0" cy="0" rx="18" ry="9" fill="#0044ff" opacity="0.08" filter="url(#blur4)"/>
+    </g>
+  </g>
+
+  <!-- Slightly different fish right-to-left -->
+  <g class="fish2">
+    <g transform="translate(600, 440)">
+      <ellipse cx="0" cy="0" rx="11" ry="5" fill="#0a1525"/>
+      <polygon points="11,0 19,-4 19,4" fill="#0a1525"/>
+      <circle cx="-7" cy="-1" r="2" fill="#ff88ff" filter="url(#blur1)" opacity="0.9"/>
+      <circle cx="-7" cy="-1" r="1" fill="#ffffff" opacity="0.5"/>
+      <circle cx="-1" cy="1"  r="1.3" fill="#ff44cc" opacity="0.6" filter="url(#blur1)"/>
+      <circle cx="3"  cy="0"  r="1"   fill="#ff88dd" opacity="0.5" filter="url(#blur1)"/>
+      <ellipse cx="1" cy="-4" rx="5" ry="2" fill="#091320" transform="rotate(-10 1 -4)"/>
+      <ellipse cx="0" cy="0" rx="15" ry="8" fill="#ff00aa" opacity="0.06" filter="url(#blur4)"/>
+    </g>
+  </g>
+
+  <!-- ===== ANGLERFISH (bottom) ===== -->
+  <g transform="translate(300, 730)">
+    <!-- body -->
+    <ellipse cx="0" cy="0" rx="36" ry="24" fill="#060410"/>
+    <!-- mouth with teeth -->
+    <path d="M-20,10 Q0,22 20,10 Q15,18 10,14 Q5,22 0,16 Q-5,22 -10,14 Q-15,18 -20,10Z" fill="#0a0818"/>
+    <path d="M-20,10 Q0,22 20,10" fill="none" stroke="#222040" stroke-width="1"/>
+    <!-- teeth -->
+    <polygon points="-14,11 -11,18 -8,11" fill="#ccddff" opacity="0.3"/>
+    <polygon points="-4,13  -1,20  2,13"  fill="#ccddff" opacity="0.3"/>
+    <polygon points="7,11   10,18  13,11" fill="#ccddff" opacity="0.3"/>
+    <!-- eye -->
+    <circle cx="-18" cy="-5" r="9" fill="#080620"/>
+    <circle cx="-18" cy="-5" r="6" fill="#0d0a2a"/>
+    <circle cx="-16" cy="-7" r="3" fill="#3322aa" opacity="0.8"/>
+    <circle cx="-16" cy="-7" r="1.5" fill="#8866ff" opacity="0.9"/>
+    <circle cx="-15" cy="-8" r="0.7" fill="#ffffff" opacity="0.8"/>
+    <!-- dorsal fin -->
+    <path d="M-10,-24 C-5,-40 10,-42 20,-28" fill="#070518" stroke="#0a0820" stroke-width="1"/>
+    <!-- lure (bioluminescent) -->
+    <line x1="-5" y1="-24" x2="10" y2="-55" stroke="#113" stroke-width="1.5"/>
+    <g class="angler-lure">
+      <circle cx="10" cy="-55" r="7" fill="#00ffcc" opacity="0.9"/>
+      <circle cx="10" cy="-55" r="4" fill="#ffffff"  opacity="0.8"/>
+    </g>
+    <!-- glow around angler -->
+    <ellipse cx="0" cy="0" rx="50" ry="35" fill="#000033" opacity="0.5" filter="url(#blur8)"/>
+  </g>
+
+  <!-- ===== JELLYFISH 1 (large, cyan) ===== -->
+  <g class="jelly1" transform="translate(420, 260)">
+    <!-- ambient glow -->
+    <ellipse cx="0" cy="0" rx="70" ry="60" fill="url(#jellyGlow1)" opacity="0.25" filter="url(#blur8)"/>
+    <!-- bell body -->
+    <g class="jelly-body">
+      <path d="M-45,0 Q-45,-55 0,-60 Q45,-55 45,0 Q30,15 0,18 Q-30,15 -45,0Z"
+            fill="#0a3a4a" opacity="0.85"/>
+      <path d="M-45,0 Q-45,-55 0,-60 Q45,-55 45,0 Q30,15 0,18 Q-30,15 -45,0Z"
+            fill="none" stroke="#88eeff" stroke-width="1" opacity="0.6"/>
+      <!-- inner radial pattern -->
+      <path d="M0,18 L0,-60" stroke="#44ccdd" stroke-width="0.7" opacity="0.3"/>
+      <path d="M-45,0 Q-22,-30 0,18" stroke="#44ccdd" stroke-width="0.7" opacity="0.3" fill="none"/>
+      <path d="M45,0 Q22,-30 0,18" stroke="#44ccdd" stroke-width="0.7" opacity="0.3" fill="none"/>
+      <!-- top dome highlight -->
+      <ellipse cx="0" cy="-30" rx="30" ry="18" fill="#88eeff" opacity="0.12"/>
+      <!-- rim glow -->
+      <path d="M-45,0 Q-30,15 0,18 Q30,15 45,0"
+            fill="none" stroke="#88ffff" stroke-width="2" opacity="0.5" filter="url(#blur1)"/>
+    </g>
+    <!-- tentacles -->
+    <g opacity="0.7" stroke-linecap="round">
+      <path d="M-30,16 C-32,35 -28,55 -30,80" stroke="#44ccee" stroke-width="1.5" fill="none"/>
+      <path d="M-15,18 C-16,40 -12,62 -14,90" stroke="#55ddff" stroke-width="1.2" fill="none"/>
+      <path d="M0,18 C2,42 -2,65 0,95" stroke="#44ccee" stroke-width="1.5" fill="none"/>
+      <path d="M15,18 C17,40 13,62 16,88" stroke="#55ddff" stroke-width="1.2" fill="none"/>
+      <path d="M30,16 C33,35 29,55 32,78" stroke="#44ccee" stroke-width="1.5" fill="none"/>
+      <!-- oral arms (shorter, thicker) -->
+      <path d="M-20,16 C-22,28 -18,38 -22,48" stroke="#aaffff" stroke-width="2" fill="none" opacity="0.5"/>
+      <path d="M20,16 C22,28 18,38 22,48" stroke="#aaffff" stroke-width="2" fill="none" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- ===== JELLYFISH 2 (medium, magenta) ===== -->
+  <g class="jelly2" transform="translate(130, 380)">
+    <ellipse cx="0" cy="0" rx="50" ry="42" fill="url(#jellyGlow2)" opacity="0.22" filter="url(#blur8)"/>
+    <g class="jelly-body2">
+      <path d="M-32,0 Q-32,-40 0,-44 Q32,-40 32,0 Q22,10 0,12 Q-22,10 -32,0Z"
+            fill="#2a0a30" opacity="0.82"/>
+      <path d="M-32,0 Q-32,-40 0,-44 Q32,-40 32,0 Q22,10 0,12 Q-22,10 -32,0Z"
+            fill="none" stroke="#ffaaee" stroke-width="1" opacity="0.5"/>
+      <ellipse cx="0" cy="-22" rx="20" ry="12" fill="#ffaaee" opacity="0.1"/>
+      <path d="M-32,0 Q-22,10 0,12 Q22,10 32,0"
+            fill="none" stroke="#ffbbff" stroke-width="1.5" opacity="0.45" filter="url(#blur1)"/>
+      <path d="M0,12 L0,-44" stroke="#cc88dd" stroke-width="0.6" opacity="0.25"/>
+      <path d="M-32,0 Q-16,-20 0,12" stroke="#cc88dd" stroke-width="0.6" opacity="0.25" fill="none"/>
+      <path d="M32,0 Q16,-20 0,12"   stroke="#cc88dd" stroke-width="0.6" opacity="0.25" fill="none"/>
+    </g>
+    <g opacity="0.65" stroke-linecap="round">
+      <path d="M-22,10 C-24,28 -20,46 -22,66" stroke="#dd88ff" stroke-width="1.2" fill="none"/>
+      <path d="M-10,12 C-11,30 -8,50 -10,70" stroke="#ee99ff" stroke-width="1" fill="none"/>
+      <path d="M0,12 C1,32 -1,52 0,72" stroke="#dd88ff" stroke-width="1.2" fill="none"/>
+      <path d="M10,12 C12,30 9,50 11,68" stroke="#ee99ff" stroke-width="1" fill="none"/>
+      <path d="M22,10 C24,28 21,46 23,64" stroke="#dd88ff" stroke-width="1.2" fill="none"/>
+    </g>
+  </g>
+
+  <!-- ===== JELLYFISH 3 (small, green) ===== -->
+  <g class="jelly3" transform="translate(510, 480)">
+    <ellipse cx="0" cy="0" rx="40" ry="34" fill="url(#jellyGlow3)" opacity="0.2" filter="url(#blur8)"/>
+    <g class="jelly-body3">
+      <path d="M-25,0 Q-25,-32 0,-35 Q25,-32 25,0 Q17,8 0,9 Q-17,8 -25,0Z"
+            fill="#042218" opacity="0.8"/>
+      <path d="M-25,0 Q-25,-32 0,-35 Q25,-32 25,0 Q17,8 0,9 Q-17,8 -25,0Z"
+            fill="none" stroke="#88ffcc" stroke-width="1" opacity="0.5"/>
+      <ellipse cx="0" cy="-17" rx="15" ry="9" fill="#88ffcc" opacity="0.1"/>
+      <path d="M-25,0 Q-17,8 0,9 Q17,8 25,0"
+            fill="none" stroke="#aaffdd" stroke-width="1.5" opacity="0.45" filter="url(#blur1)"/>
+    </g>
+    <g opacity="0.65" stroke-linecap="round">
+      <path d="M-18,8 C-20,22 -16,36 -18,52" stroke="#55ffcc" stroke-width="1" fill="none"/>
+      <path d="M-7,9 C-8,24 -5,40 -7,56" stroke="#77ffdd" stroke-width="0.9" fill="none"/>
+      <path d="M0,9 C1,25 -1,42 0,58" stroke="#55ffcc" stroke-width="1" fill="none"/>
+      <path d="M7,9 C9,24 6,40 8,54" stroke="#77ffdd" stroke-width="0.9" fill="none"/>
+      <path d="M18,8 C20,22 17,36 19,50" stroke="#55ffcc" stroke-width="1" fill="none"/>
+    </g>
+  </g>
+
+  <!-- ===== GLOWING ORBS (scattered plankton) ===== -->
+  <g>
+    <circle class="glow-orb" cx="320" cy="180" r="2.5" fill="#0088ff" filter="url(#blur2)" opacity="0.7"/>
+    <circle class="glow-orb" cx="80"  cy="310" r="2"   fill="#ff44aa" filter="url(#blur2)" opacity="0.6" style="animation-delay:1s"/>
+    <circle class="glow-orb" cx="540" cy="250" r="1.8" fill="#44ffcc" filter="url(#blur2)" opacity="0.65" style="animation-delay:2s"/>
+    <circle class="glow-orb" cx="160" cy="200" r="2.2" fill="#ffaa00" filter="url(#blur2)" opacity="0.55" style="animation-delay:0.5s"/>
+    <circle class="glow-orb" cx="380" cy="350" r="1.5" fill="#aa44ff" filter="url(#blur2)" opacity="0.6" style="animation-delay:1.8s"/>
+    <circle class="glow-orb" cx="480" cy="160" r="2"   fill="#00ffcc" filter="url(#blur2)" opacity="0.5" style="animation-delay:3s"/>
+    <circle class="glow-orb" cx="220" cy="450" r="1.8" fill="#ff8844" filter="url(#blur2)" opacity="0.6" style="animation-delay:0.8s"/>
+    <circle class="glow-orb" cx="550" cy="600" r="2.2" fill="#44aaff" filter="url(#blur2)" opacity="0.55" style="animation-delay:2.5s"/>
+    <circle class="glow-orb" cx="40"  cy="550" r="1.5" fill="#ffddaa" filter="url(#blur2)" opacity="0.5" style="animation-delay:1.2s"/>
+  </g>
+
+  <!-- ===== FOREGROUND depth vignette ===== -->
+  <rect width="600" height="800" fill="url(#ocean)" opacity="0.18"/>
+  <!-- side vignettes -->
+  <rect x="0" y="0" width="60" height="800" fill="#000408" opacity="0.45"/>
+  <rect x="540" y="0" width="60" height="800" fill="#000408" opacity="0.45"/>
+  <!-- top vignette -->
+  <rect x="0" y="0" width="600" height="80" fill="#000d18" opacity="0.5"/>
+  <!-- bottom vignette -->
+  <rect x="0" y="720" width="600" height="80" fill="#000204" opacity="0.7"/>
+</svg>
+</div>
+
+<p class="title">Abyssal Luminescence</p>
+
+</body>
+</html>
