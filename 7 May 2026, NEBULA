@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula • Dreamscape</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Playfair+Display:wght@700&amp;display=swap');
+
+        :root {
+            --primary: #a855f7;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .title-font {
+            font-family: 'Playfair Display', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1133 50%, #0f172a 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .neon-text {
+            text-shadow: 
+                0 0 10px rgb(168 85 247),
+                0 0 20px rgb(168 85 247),
+                0 0 40px rgb(168 85 247);
+        }
+
+        .orbit {
+            animation: orbit 25s linear infinite;
+        }
+
+        @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse-slow {
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 4s infinite alternate;
+        }
+    </style>
+</head>
+<body class="gradient-bg text-white overflow-hidden min-h-screen">
+    <!-- Background Canvas -->
+    <canvas id="canvas" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+
+    <!-- Stars -->
+    <div id="stars" class="fixed inset-0 z-10 pointer-events-none"></div>
+
+    <!-- Main Content -->
+    <div class="relative z-20 min-h-screen flex flex-col">
+        <!-- Navbar -->
+        <nav class="glass border-b border-white/10 py-6">
+            <div class="max-w-7xl mx-auto px-8 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">N</span>
+                    </div>
+                    <span class="text-2xl font-semibold tracking-tight">Nebula</span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                    <a href="#" class="hover:text-purple-400 transition-colors">Journey</a>
+                    <a href="#" class="hover:text-purple-400 transition-colors">Explore</a>
+                    <a href="#" class="hover:text-purple-400 transition-colors">Gallery</a>
+                    <a href="#" class="hover:text-purple-400 transition-colors">Connect</a>
+                </div>
+                
+                <button onclick="launchRocket()" 
+                        class="px-6 py-3 bg-white text-purple-950 rounded-2xl font-semibold flex items-center gap-2 hover:scale-105 transition-all active:scale-95">
+                    <i class="fa-solid fa-rocket"></i>
+                    <span>Launch</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="flex-1 flex items-center justify-center px-6 pt-20">
+            <div class="max-w-4xl mx-auto text-center">
+                <!-- Floating Orb -->
+                <div class="relative mx-auto w-64 h-64 mb-12">
+                    <!-- Outer glow rings -->
+                    <div class="absolute inset-0 rounded-full border border-purple-400/30 pulse-slow" style="animation-delay: 0s;"></div>
+                    <div class="absolute inset-[15%] rounded-full border border-pink-400/30 pulse-slow" style="animation-delay: 1.5s;"></div>
+                    <div class="absolute inset-[30%] rounded-full border border-cyan-400/30 pulse-slow" style="animation-delay: 3s;"></div>
+                    
+                    <!-- Central Orb -->
+                    <div id="orb" 
+                         class="w-64 h-64 rounded-full bg-gradient-to-br from-purple-400 via-pink-400 to-cyan-400 shadow-2xl shadow-purple-500/60 flex items-center justify-center relative overflow-hidden cursor-pointer transition-all hover:scale-110">
+                        <!-- Inner shine -->
+                        <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/30 rounded-full blur-3xl"></div>
+                        <div class="text-6xl relative z-10 drop-shadow-2xl">🌌</div>
+                    </div>
+                    
+                    <!-- Orbiting elements -->
+                    <div class="absolute top-1/2 left-1/2 w-80 h-80 -translate-x-1/2 -translate-y-1/2">
+                        <div class="orbit absolute top-0 left-1/2 w-6 h-6 -translate-x-1/2">
+                            <div class="w-6 h-6 bg-white rounded-full shadow-lg flex items-center justify-center text-xs">✦</div>
+                        </div>
+                        <div class="orbit absolute top-1/2 left-0 w-6 h-6 -translate-y-1/2" style="animation-duration: 18s; animation-direction: reverse;">
+                            <div class="w-6 h-6 bg-cyan-300 rounded-full shadow-lg flex items-center justify-center text-xs">★</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="title-font text-7xl md:text-8xl font-bold tracking-tighter neon-text mb-4">
+                    DREAM IN<br>THE NEBULA
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-purple-200/90 max-w-lg mx-auto mb-10">
+                    A cosmic journey through infinite beauty and motion
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="explore()" 
+                            class="group px-10 py-6 bg-white text-purple-950 rounded-3xl font-semibold text-lg flex items-center justify-center gap-3 hover:bg-purple-100 transition-all">
+                        Begin Exploration
+                        <i class="fa-solid fa-arrow-right group-active:rotate-45 transition-transform"></i>
+                    </button>
+                    
+                    <button onclick="watchVideo()" 
+                            class="px-10 py-6 border border-white/40 hover:border-white/70 rounded-3xl font-medium flex items-center gap-3 transition-all">
+                        <i class="fa-solid fa-play"></i>
+                        Watch the Cosmos
+                    </button>
+                </div>
+
+                <!-- Scroll indicator -->
+                <div class="mt-20 flex justify-center">
+                    <div class="flex flex-col items-center gap-2 text-purple-300/70 text-sm">
+                        <div class="w-px h-12 bg-gradient-to-b from-transparent via-purple-300/50 to-transparent"></div>
+                        <span>Scroll to explore</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer bar -->
+        <div class="py-8 text-center text-xs text-purple-300/60 flex items-center justify-center gap-8">
+            <div>Made with wonder</div>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+            <div>∞</div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script already loaded via CDN
+        
+        // Particle Canvas
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.speedY = Math.random() * 0.6 - 0.3;
+                this.opacity = Math.random() * 0.6 + 0.3;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            
+            draw() {
+                ctx.fillStyle = `rgba(165, 243, 252, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function initParticles() {
+            particles = [];
+            const count = Math.floor(window.innerWidth * window.innerHeight / 8000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            
+            // Connect nearby particles
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 120) {
+                        ctx.strokeStyle = `rgba(192, 132, 252, ${0.15 * (120 - distance) / 120})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animateParticles);
+        }
+        
+        // Create background stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            
+            for (let i = 0; i < 180; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `-${Math.random() * 4}s`;
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Interactive orb
+        const orb = document.getElementById('orb');
+        orb.addEventListener('mousemove', (e) => {
+            const rect = orb.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            
+            orb.style.transform = `perspective(1000px) rotateX(\( {y * -25}deg) rotateY( \){x * 35}deg)`;
+        });
+        
+        orb.addEventListener('mouseleave', () => {
+            orb.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+        });
+        
+        // Button interactions
+        function launchRocket() {
+            const btn = document.querySelector('button');
+            btn.innerHTML = `<i class="fa-solid fa-rocket animate-bounce"></i> Launching...`;
+            
+            setTimeout(() => {
+                alert("🚀 You are now floating through the nebula! ✨");
+                btn.innerHTML = `<i class="fa-solid fa-rocket"></i> Launch`;
+            }, 1200);
+        }
+        
+        function explore() {
+            const hero = document.querySelector('.flex-1');
+            hero.style.transition = 'all 1.2s cubic-bezier(0.23, 1, 0.32, 1)';
+            hero.style.transform = 'translateY(-80px)';
+            hero.style.opacity = '0';
+            
+            setTimeout(() => {
+                alert("🌠 Welcome, cosmic traveler. The universe is yours to explore.");
+                hero.style.transform = 'translateY(0)';
+                hero.style.opacity = '1';
+            }, 1500);
+        }
+        
+        function watchVideo() {
+            alert("🎥 Imagine a breathtaking 4K timelapse of the real Orion Nebula playing right now...");
+        }
+        
+        // Keyboard fun
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement.tagName !== "INPUT") {
+                e.preventDefault();
+                alert("💡 You discovered the hidden command line of the cosmos!");
+            }
+        });
+        
+        // Initialize everything
+        window.onload = function() {
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+            createStars();
+            
+            // Resize handler
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initParticles();
+            });
+            
+            // Occasional shooting star
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const shootingStar = document.createElement('div');
+                    shootingStar.style.position = 'fixed';
+                    shootingStar.style.width = '3px';
+                    shootingStar.style.height = '3px';
+                    shootingStar.style.background = 'white';
+                    shootingStar.style.borderRadius = '50%';
+                    shootingStar.style.boxShadow = '0 0 15px white';
+                    shootingStar.style.left = Math.random() * 100 + '%';
+                    shootingStar.style.top = Math.random() * 40 + '%';
+                    shootingStar.style.zIndex = '5';
+                    shootingStar.style.transition = 'all 1.2s linear';
+                    document.body.appendChild(shootingStar);
+                    
+                    setTimeout(() => {
+                        shootingStar.style.transform = `translate(${window.innerWidth * 0.6}px, ${window.innerHeight * 0.4}px)`;
+                        shootingStar.style.opacity = '0';
+                    }, 50);
+                    
+                    setTimeout(() => shootingStar.remove(), 1800);
+                }
+            }, 2800);
+            
+            console.log('%c🌌 Nebula Dreamscape loaded successfully', 'color: #c084fc; font-family: monospace;');
+        };
+    </script>
+</body>
+</html>
